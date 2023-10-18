@@ -16,6 +16,35 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `Game`
+--
+
+DROP TABLE IF EXISTS `Game`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Game` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `league_id` int unsigned NOT NULL,
+  `season_id` int unsigned NOT NULL,
+  `home_team_id` int unsigned NOT NULL,
+  `away_team_id` int unsigned NOT NULL,
+  `game_type` enum('UNKNOWN','PRESEASON','REGULAR_SEASON','POSTSEASON_RND_8','POSTSEASON_RND_4','POSTSEASON_RND_2') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `game_start_timestamp_secs` int unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Game`
+--
+
+LOCK TABLES `Game` WRITE;
+/*!40000 ALTER TABLE `Game` DISABLE KEYS */;
+INSERT INTO `Game` VALUES (1,1,1,28,25,'REGULAR_SEASON',1695249000);
+/*!40000 ALTER TABLE `Game` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `Gamelog`
 --
 
@@ -24,12 +53,7 @@ DROP TABLE IF EXISTS `Gamelog`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Gamelog` (
   `player_id` int unsigned NOT NULL,
-  `league_id` int unsigned NOT NULL,
-  `season_id` int unsigned NOT NULL,
-  `team_id` int unsigned NOT NULL,
-  `game_start_timestamp_secs` int unsigned NOT NULL,
-  `game_type` enum('UNKNOWN','PRESEASON','REGULAR_SEASON','POSTSEASON_RND_8','POSTSEASON_RND_4','POSTSEASON_RND_2') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'UNKNOWN',
-  `opponent_id` int unsigned NOT NULL,
+  `game_id` int unsigned NOT NULL,
   `game_started` tinyint unsigned DEFAULT NULL,
   `field_goals` int unsigned NOT NULL,
   `field_goals_attempted` int unsigned NOT NULL,
@@ -65,15 +89,10 @@ CREATE TABLE `Gamelog` (
   `turnover_percentage` float unsigned NOT NULL,
   `game_score` float NOT NULL,
   `efficiency` int NOT NULL,
-  PRIMARY KEY (`game_start_timestamp_secs`,`player_id`,`league_id`,`season_id`,`opponent_id`),
-  KEY `Gamelog-Player` (`player_id`),
-  KEY `Gamelog-League` (`league_id`),
-  KEY `Gamelog-Season` (`season_id`),
-  KEY `Gamelog-Opponent` (`opponent_id`),
-  CONSTRAINT `Gamelog-League` FOREIGN KEY (`league_id`) REFERENCES `League` (`id`),
-  CONSTRAINT `Gamelog-Opponent` FOREIGN KEY (`opponent_id`) REFERENCES `Team` (`id`),
-  CONSTRAINT `Gamelog-Player` FOREIGN KEY (`player_id`) REFERENCES `Player` (`id`),
-  CONSTRAINT `Gamelog-Season` FOREIGN KEY (`season_id`) REFERENCES `Season` (`id`)
+  PRIMARY KEY (`player_id`,`game_id`),
+  KEY `Gamelog-Game` (`game_id`),
+  CONSTRAINT `Gamelog-Game` FOREIGN KEY (`game_id`) REFERENCES `Game` (`id`),
+  CONSTRAINT `Gamelog-Player` FOREIGN KEY (`player_id`) REFERENCES `Player` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -83,7 +102,7 @@ CREATE TABLE `Gamelog` (
 
 LOCK TABLES `Gamelog` WRITE;
 /*!40000 ALTER TABLE `Gamelog` DISABLE KEYS */;
-INSERT INTO `Gamelog` VALUES (9,1,4,25,1695249000,'PRESEASON',28,1,4,6,0.667,1,1,1,3,5,0.6,0,0,0,11,2,1,1,2,1,0,1,1,6,1.833,0.917,0.917,0.833,0,0.029,0.037,0.024,'2.0',0.143,10.4,13),(10,1,4,28,1695249000,'PRESEASON',25,1,5,16,0.313,5,10,0.5,0,6,0,6,6,1,16,3,0,3,1,0,0,2,1,21,0.767,0.313,0.429,0.375,0.375,0.044,0,0.111,'0.5',0.096,6,7),(11,1,4,28,1695249000,'PRESEASON',25,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,1,0,0.015,0.024,0,'0.0',0,-0.4,0),(12,1,4,28,1695249000,'PRESEASON',25,0,1,3,0.333,1,2,0.5,0,1,0,0,0,0,2,8,3,5,0,2,0,0,2,0,0,0.333,0.333,0.333,0,0.118,0.073,0.185,'0.0',0,5.1,10),(13,1,4,25,1695249000,'PRESEASON',28,1,5,10,0.5,3,7,0.429,2,3,0.667,2,2,1,14,5,1,4,3,2,0,3,1,13,1.081,0.6,0.643,0.3,0.2,0.074,0.037,0.098,'1.0',0.215,11.6,16),(17,1,4,28,1695249000,'PRESEASON',25,1,3,9,0.333,3,7,0.429,0,2,0,0,2,0,6,6,3,3,1,3,0,4,3,11,0.548,0.333,0.304,0.222,0.222,0.088,0.073,0.111,'0.25',0.287,1.6,4),(20,1,4,25,1695249000,'PRESEASON',28,0,4,5,0.8,4,5,0.8,0,0,0,0,2,0,8,4,0,4,1,0,0,4,3,10,0.804,0.8,0.68,0,0.4,0,0,0,'0.25',0.402,2,6),(21,1,4,28,1695249000,'PRESEASON',25,1,4,12,0.333,3,9,0.333,1,3,0.333,6,8,0.75,15,11,7,4,1,1,2,2,1,11,1.389,0.375,0.483,0.25,0.667,0.162,0.171,0.148,'0.5',0.112,14.2,18),(22,1,4,25,1695249000,'PRESEASON',28,1,7,11,0.636,4,5,0.8,3,6,0.5,0,0,0,17,5,0,5,5,0,2,0,1,11,1.545,0.773,0.773,0.545,0,0.074,0,0.122,'0.0',0,18.1,25),(25,1,4,25,1695249000,'PRESEASON',28,1,1,2,0.5,1,2,0.5,0,0,0,0,0,0,2,3,1,2,2,0,1,1,2,2,1,0.5,0.5,0,0,0.044,0.037,0.049,'2.0',0.333,2.6,6),(29,1,4,28,1695249000,'PRESEASON',25,1,3,11,0.273,1,2,0.5,2,9,0.222,0,0,0,8,3,1,2,3,0,1,3,3,13,0.615,0.364,0.364,0.818,0,0.044,0.024,0.074,'1.0',0.214,1.4,4),(30,1,4,25,1695249000,'PRESEASON',28,1,6,15,0.4,6,15,0.4,0,0,0,4,9,0.444,16,10,1,9,2,1,0,3,1,21,0.752,0.4,0.422,0,0.6,0.147,0.037,0.22,'0.667',0.135,8.3,12),(39,1,4,25,1695249000,'PRESEASON',28,0,1,4,0.25,0,1,0,1,3,0.333,0,1,0,3,2,1,1,0,0,0,1,3,4,0.67,0.375,0.338,0.75,0.25,0.029,0.037,0.024,'0.0',0.183,-1,0),(49,1,4,28,1695249000,'PRESEASON',25,1,3,9,0.333,2,3,0.667,1,6,0.167,0,0,0,7,3,0,3,0,1,0,2,3,11,0.636,0.389,0.389,0.667,0,0.044,0,0.111,'0.0',0.182,0.6,3);
+INSERT INTO `Gamelog` VALUES (9,1,1,4,6,0.667,1,1,1,3,5,0.6,0,0,0,11,2,1,1,2,1,0,1,1,6,1.833,0.917,0.917,0.833,0,0.029,0.037,0.024,'2.0',0.143,10.4,13),(10,1,1,5,16,0.313,5,10,0.5,0,6,0,6,6,1,16,3,0,3,1,0,0,2,1,21,0.767,0.313,0.429,0.375,0.375,0.044,0,0.111,'0.5',0.096,6,7),(11,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,1,0,0.015,0.024,0,'0.0',0,-0.4,0),(12,1,0,1,3,0.333,1,2,0.5,0,1,0,0,0,0,2,8,3,5,0,2,0,0,2,0,0,0.333,0.333,0.333,0,0.118,0.073,0.185,'0.0',0,5.1,10),(13,1,1,5,10,0.5,3,7,0.429,2,3,0.667,2,2,1,14,5,1,4,3,2,0,3,1,13,1.081,0.6,0.643,0.3,0.2,0.074,0.037,0.098,'1.0',0.215,11.6,16),(17,1,1,3,9,0.333,3,7,0.429,0,2,0,0,2,0,6,6,3,3,1,3,0,4,3,11,0.548,0.333,0.304,0.222,0.222,0.088,0.073,0.111,'0.25',0.287,1.6,4),(20,1,0,4,5,0.8,4,5,0.8,0,0,0,0,2,0,8,4,0,4,1,0,0,4,3,10,0.804,0.8,0.68,0,0.4,0,0,0,'0.25',0.402,2,6),(21,1,1,4,12,0.333,3,9,0.333,1,3,0.333,6,8,0.75,15,11,7,4,1,1,2,2,1,11,1.389,0.375,0.483,0.25,0.667,0.162,0.171,0.148,'0.5',0.112,14.2,18),(22,1,1,7,11,0.636,4,5,0.8,3,6,0.5,0,0,0,17,5,0,5,5,0,2,0,1,11,1.545,0.773,0.773,0.545,0,0.074,0,0.122,'0.0',0,18.1,25),(25,1,1,1,2,0.5,1,2,0.5,0,0,0,0,0,0,2,3,1,2,2,0,1,1,2,2,1,0.5,0.5,0,0,0.044,0.037,0.049,'2.0',0.333,2.6,6),(29,1,1,3,11,0.273,1,2,0.5,2,9,0.222,0,0,0,8,3,1,2,3,0,1,3,3,13,0.615,0.364,0.364,0.818,0,0.044,0.024,0.074,'1.0',0.214,1.4,4),(30,1,1,6,15,0.4,6,15,0.4,0,0,0,4,9,0.444,16,10,1,9,2,1,0,3,1,21,0.752,0.4,0.422,0,0.6,0.147,0.037,0.22,'0.667',0.135,8.3,12),(39,1,0,1,4,0.25,0,1,0,1,3,0.333,0,1,0,3,2,1,1,0,0,0,1,3,4,0.67,0.375,0.338,0.75,0.25,0.029,0.037,0.024,'0.0',0.183,-1,0),(49,1,1,3,9,0.333,2,3,0.667,1,6,0.167,0,0,0,7,3,0,3,0,1,0,2,3,11,0.636,0.389,0.389,0.667,0,0.044,0,0.111,'0.0',0.182,0.6,3);
 /*!40000 ALTER TABLE `Gamelog` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -231,4 +250,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-10-16 21:24:04
+-- Dump completed on 2023-10-18  0:35:22
